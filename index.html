@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AIR FRESH</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
+  <link rel="shortcut icon" href="https://cdn-icons-png.flaticon.com/512/2913/2913465.png" type="image/x-icon">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <style>
+    :root {
+      --green: #28a745;
+      --soft-green: #d9f9e4;
+      --light-bg: #f4fff9;
+      --gradient-bg: linear-gradient(to right, #e6ffe6, #ffffff);
+      --radius: 20px;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: var(--gradient-bg);
+      scroll-behavior: smooth;
+    }
+
+    .navbar {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+      background: white !important;
+    }
+
+    .logo {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: var(--green);
+      text-shadow: 2px 2px 2px #b6e7c9;
+    }
+
+    .section {
+      padding: 80px 0;
+    }
+
+    h1, h2 {
+      color: #14532d;
+      font-weight: 700;
+    }
+
+    .feedback-placeholder,
+    canvas,
+    #mapid {
+      border-radius: var(--radius);
+      box-shadow: 0 0 25px rgba(0, 0, 0, 0.08);
+      background: white;
+    }
+
+    #mapid {
+      height: 450px;
+    }
+
+    .leaflet-control-attribution {
+      display: none !important;
+    }
+
+    .btn-success {
+      background: linear-gradient(135deg, #34d399, #10b981);
+      border: none;
+      font-weight: 600;
+    }
+
+    .btn-outline-success {
+      border-radius: 50px;
+      padding: 6px 20px;
+    }
+
+    footer {
+      background: #c6f3d7;
+      font-weight: 500;
+      border-top: 2px solid #28a74522;
+    }
+
+    .nav-link.active {
+      font-weight: bold;
+      color: var(--green) !important;
+    }
+
+    #airChart {
+      max-height: 300px;
+    }
+  </style>
+</head>
+<body>
+  <!-- NAVBAR -->
+  <nav class="navbar navbar-expand-lg navbar-light px-4 py-3 animate__animated animate__fadeInDown">
+    <a class="navbar-brand logo" href="#">AIR FRESH</a>
+    <div class="ms-auto d-flex gap-2">
+      <a href="map.html" class="btn btn-outline-success">Xarita</a>
+      <a href="statistika.html" class="btn btn-outline-success">Statistika</a>
+      <a href="chat.html" class="btn btn-success text-white">Fikr-mulohaza</a>
+    </div>
+  </nav>
+
+  <!-- HEADER -->
+  <header class="text-center section bg-white animate__animated animate__fadeIn">
+    <h1 class="mb-3 display-5 fw-bold">Toshkent shahridagi havo sifatini nazorat qiluvchi ilova</h1>
+    <p class="lead">AIR FRESH – Sizga eng toza hududlarni topishga va daraxt ekish joylarini aniqlashga yordam beradi.</p>
+  </header>
+
+  <!-- MAP -->
+  <section id="map" class="section animate__animated animate__fadeInUp">
+    <div class="container">
+      <h2 class="text-center mb-4">Xarita orqali ko'rish</h2>
+      <div id="mapid"></div>
+    </div>
+  </section>
+
+  <!-- CHART -->
+  <section id="stats" class="section bg-light animate__animated animate__fadeInUp">
+    <div class="container">
+      <h2 class="text-center mb-4">7 kunlik havo sifati statistikasi</h2>
+      <canvas id="airChart"></canvas>
+    </div>
+  </section>
+
+  <!-- FEEDBACK -->
+  <section id="feedback" class="section animate__animated animate__fadeInUp">
+    <div class="container">
+      <h2 class="text-center mb-4">Fikr va tavsiyalar</h2>
+      <form class="feedback-placeholder p-4" onsubmit="sendFeedback(event)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input type="text" id="district" class="form-control" placeholder="Hududingiz nomi">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="location" class="form-control" placeholder="Daraxt ekish joyi bo‘yicha fikr">
+          </div>
+          <div class="col-12">
+            <textarea class="form-control" id="comment" rows="3" placeholder="Qo‘shimcha izohlar..."></textarea>
+          </div>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success px-4">Yuborish</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="section animate__animated animate__fadeInUp" style="background: var(--light-bg);">
+    <div class="container">
+      <h2 class="text-center mb-4">Biz bilan bog‘lanish</h2>
+      <div class="row justify-content-center">
+        <div class="col-md-6">
+          <div class="p-4 border rounded shadow-sm bg-white" style="border-radius: var(--radius); box-shadow: 0 0 20px rgba(0, 0, 0, 0.06);">
+            <p class="mb-2"><strong>📧 Email:</strong> muhammadisomirganiev@gmail.com</p>
+            <p class="mb-2"><strong>📞 Telefon:</strong> +998 95 393 23 33</p>
+            <p class="mb-3"><strong>📍 Manzil:</strong> Toshkent shahri, Ekopark binosi, 2-qavat</p>
+            <div class="text-center">
+              <a href="https://t.me/Kocha070bot" class="btn btn-success text-white px-4">Telegram orqali bog‘lanish</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="text-center p-4 mt-4 animate__animated animate__fadeInUp">
+    <small>&copy; 2025 AIR FRESH – Ekologik xarita ilovasi</small>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    const ctx = document.getElementById('airChart').getContext('2d');
+    new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['Dushanba', 'Seshanba', 'Chorshanba', 'Payshanba', 'Juma', 'Shanba', 'Yakshanba'],
+        datasets: [{
+          label: 'AQI darajasi',
+          data: [160, 155, 145, 135, 150, 170, 165],
+          borderColor: '#28a745',
+          backgroundColor: 'rgba(40, 167, 69, 0.2)',
+          pointBackgroundColor: '#28a745',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'top' },
+          title: {
+            display: true,
+            text: '7 kunlik havo sifati (AQI)'
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: false,
+            suggestedMin: 100,
+            suggestedMax: 180
+          }
+        }
+      }
+    });
+
+    const map = L.map('mapid').setView([41.31, 69.28], 11);
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 18
+    }).addTo(map);
+
+    const greenIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/2909/2909592.png', iconSize: [32, 32] });
+    const yellowIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/3524/3524388.png', iconSize: [32, 32] });
+    const redIcon = L.icon({ iconUrl: 'https://cdn-icons-png.flaticon.com/512/483/483361.png', iconSize: [32, 32] });
+
+    const districts = [
+      { name: 'Mirzo Ulug‘bek', coords: [41.3385, 69.3341], aqi: 85 },
+      { name: 'Yashnobod', coords: [41.2853, 69.4102], aqi: 67 },
+      { name: 'Yunusobod', coords: [41.3662, 69.2862], aqi: 75 },
+      { name: 'Chilonzor', coords: [41.2736, 69.2049], aqi: 60 },
+      { name: 'Sergeli', coords: [41.2093, 69.2127], aqi: 55 },
+      { name: 'Olmazor', coords: [41.2820, 69.1555], aqi: 62 },
+      { name: 'Shayxontohur', coords: [41.3178, 69.2470], aqi: 65 },
+      { name: 'Uchtepa', coords: [41.3011, 69.1745], aqi: 58 }
+    ];
+
+    const getIconByAQI = (aqi) => {
+      if (aqi >= 70) return greenIcon;
+      if (aqi >= 65) return yellowIcon;
+      return redIcon;
+    };
+
+    districts.forEach(d => {
+      const icon = getIconByAQI(d.aqi);
+      const status = d.aqi >= 70 ? "Toza havo" : (d.aqi >= 65 ? "O‘rtacha" : "Iflos havo");
+      L.marker(d.coords, { icon: icon })
+        .addTo(map)
+        .bindPopup(`<b>${d.name}</b><br>AQI: <strong>${d.aqi}</strong><br>Havo sifati: <strong>${status}</strong>`);
+    });
+
+    function sendFeedback(e) {
+      e.preventDefault();
+      const token = '6983322841:AAFWwjMq3HIUtRm04OCBHFnwTnzJ8s0nvKM'; // o'zingizni Telegram bot tokeningizni yozing
+      const chatId = '6878754479'; // o'zingizni chat ID yozing
+      const district = document.getElementById('district').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+
+      if (!district && !location && !comment) {
+        alert("Iltimos, kamida bitta maydonni to‘ldiring.");
+        return;
+      }
+
+      const text = `🌱 *Yangi Fikrlar:*\n🌇 Hudud: ${district || '-'}\n📍 Joy: ${location || '-'}\n📝 Izoh: ${comment || '-'}`;
+      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+
+      fetch(url)
+        .then(res => res.ok ? alert("✅ Xabaringiz yuborildi!") : alert("❌ Xatolik yuz berdi."))
+        .catch(err => alert("⚠️ Tarmoqda muammo: " + err));
+
+      document.getElementById('district').value = '';
+      document.getElementById('location').value = '';
+      document.getElementById('comment').value = '';
+    }
+  </script>
+</body>
+</html>

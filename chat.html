@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fikrlar | AIR FRESH</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background: linear-gradient(to right, #f0f4ff, #ffffff);
+      font-family: 'Segoe UI', sans-serif;
+    }
+    .section {
+      padding: 60px 0;
+    }
+    .feedback-placeholder {
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+    .btn-success {
+      border-radius: 8px;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <section id="feedback" class="section">
+    <div class="container">
+      <h2 class="text-center mb-4">Fikr va tavsiyalar</h2>
+
+      <form class="feedback-placeholder p-4" onsubmit="sendFeedback(event)">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <input type="text" id="district" class="form-control" placeholder="Hududingiz nomi">
+          </div>
+          <div class="col-md-6">
+            <input type="text" id="location" class="form-control" placeholder="Daraxt ekish joyi bo‘yicha fikr">
+          </div>
+          <div class="col-12">
+            <textarea class="form-control" id="comment" rows="3" placeholder="Qo‘shimcha izohlar..."></textarea>
+          </div>
+          <div class="col-12 text-center">
+            <button type="submit" class="btn btn-success px-4">Yuborish</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </section>
+
+  <script>
+    function sendFeedback(e) {
+      e.preventDefault(); // Formani reload qilmaslik uchun
+
+      const token = '6983322841:AAEwp51Ujpenz-BgvhU6UErKsVYmEVOa9cc' // 🔁 bu yerga bot tokenni yozing
+      const chatId = '6878754479';  // 🔁 bu yerga chat ID ni yozing
+
+      const district = document.getElementById('district').value.trim();
+      const location = document.getElementById('location').value.trim();
+      const comment = document.getElementById('comment').value.trim();
+
+      if (!district && !location && !comment) {
+        alert("Iltimos, kamida bitta maydonni to‘ldiring.");
+        return;
+      }
+
+      const text = `🌱 *Yangi Fikrlar Keldi:*\n\n🏙 Hudud: ${district || '-'}\n📍 Joy: ${location || '-'}\n📝 Izoh: ${comment || '-'}`;
+
+      const url = `https://api.telegram.org/bot${token}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(text)}&parse_mode=Markdown`;
+
+      fetch(url)
+        .then(response => {
+          if (response.ok) {
+            alert("✅ Xabaringiz yuborildi!");
+            document.getElementById('district').value = '';
+            document.getElementById('location').value = '';
+            document.getElementById('comment').value = '';
+          } else {
+            alert("❌ Xatolik yuz berdi.");
+          }
+        })
+        .catch(error => {
+          alert("⚠️ Internetda muammo: " + error);
+        });
+    }
+  </script>
+
+</body>
+</html>
